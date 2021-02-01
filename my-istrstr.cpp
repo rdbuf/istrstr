@@ -34,20 +34,17 @@ std::vector<uint64_t> find_all(const char* text, const char target[4]) {
     uint64_t remainder_n = text_n - loop_n;
 
 	for (int i = 0; i < loop_n; i += 29) {
-	    std::array<char, 35> buffer{};
-	    memcpy(&buffer[0], &text[i], 35);
-
 	    // Prepare 4 source match vectors w/ different offsets
-        __m256i src0 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&buffer[0]));
+        __m256i src0 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 0]));
         __m256i res0 = _mm256_cmpeq_epi32(src0, tgt);
 
-        __m256i src1 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&buffer[1]));
+        __m256i src1 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 1]));
         __m256i res1 = _mm256_cmpeq_epi32(src1, tgt);
 
-        __m256i src2 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&buffer[2]));
+        __m256i src2 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 2]));
         __m256i res2 = _mm256_cmpeq_epi32(src2, tgt);
 
-        __m256i src3 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&buffer[3]));
+        __m256i src3 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 3]));
         __m256i res3 = _mm256_cmpeq_epi32(src3, tgt);
 
         if (!_mm256_testz_si256(res0, res0) ||
