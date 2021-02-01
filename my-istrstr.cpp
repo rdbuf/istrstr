@@ -12,14 +12,14 @@
 // 1. Take chunk of 4*m
 // 2. Make it lowercase
 // 3. Compare 4-byte sequences
-std::vector<uint64_t> find_all(const char* text, const char target[4]) {
-	const uint64_t text_n = strlen(text);
+std::vector<uint64_t> find_all(const char *text, const char target[4]) {
+    const uint64_t text_n = strlen(text);
 
-	std::vector<uint64_t> result;
+    std::vector<uint64_t> result;
 
-	// Prepare target match vector
-	std::array<uint8_t, 32> tgt_struct{};
-	memcpy(&tgt_struct[0], target, 4);
+    // Prepare target match vector
+    std::array<uint8_t, 32> tgt_struct{};
+    memcpy(&tgt_struct[0], target, 4);
     memcpy(&tgt_struct[4], target, 4);
     memcpy(&tgt_struct[8], target, 4);
     memcpy(&tgt_struct[12], target, 4);
@@ -33,8 +33,8 @@ std::vector<uint64_t> find_all(const char* text, const char target[4]) {
     uint64_t loop_n = (text_n >= 35) * (((text_n - 35) / 29) * 29);
     uint64_t remainder_n = text_n - loop_n;
 
-	for (int i = 0; i < loop_n; i += 29) {
-	    // Prepare 4 source match vectors w/ different offsets
+    for (int i = 0; i < loop_n; i += 29) {
+        // Prepare 4 source match vectors w/ different offsets
         __m256i src0 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 0]));
         __m256i res0 = _mm256_cmpeq_epi32(src0, tgt);
 
@@ -53,7 +53,7 @@ std::vector<uint64_t> find_all(const char* text, const char target[4]) {
             !_mm256_testz_si256(res3, res3)) {
             result.push_back(i);
         }
-	}
+    }
     {
         std::array<uint8_t, 32> src_struct_0{};
         memcpy(&src_struct_0[0], &text[loop_n + 0], std::min<uint64_t>(32, remainder_n));
@@ -80,25 +80,25 @@ std::vector<uint64_t> find_all(const char* text, const char target[4]) {
         }
     }
 
-	return result;
+    return result;
 }
 
-int main(int argc, const char** argv) {
-	if (argc < 3) {
-		fmt::print("usage: {} text target [n_iters]\n", argv[0]);
-		return 1;
-	}
-	const char* text_filename = argv[1];
-	const char* target = argv[2];
-	assert((strlen(target) == 4));
+int main(int argc, const char **argv) {
+    if (argc < 3) {
+        fmt::print("usage: {} text target [n_iters]\n", argv[0]);
+        return 1;
+    }
+    const char *text_filename = argv[1];
+    const char *target = argv[2];
+    assert((strlen(target) == 4));
 
-	int n_iters = 5;
-	if (argc == 4) {
-	    n_iters = atoi(argv[3]);
-	}
+    int n_iters = 5;
+    if (argc == 4) {
+        n_iters = atoi(argv[3]);
+    }
 
 
-	std::vector<char> buffer;
+    std::vector<char> buffer;
     std::ifstream f(text_filename);
     f.seekg(0, std::ios::end);
     buffer.resize(f.tellg());
@@ -118,11 +118,12 @@ int main(int argc, const char** argv) {
 
     double bytes_per_cycle = 1. * (n_iters * buffer.size()) / (end - start);
     double gb_per_second = (buffer.size() / 1e9) * n_iters /
-            std::chrono::duration_cast<std::chrono::seconds>(std::chrono::duration<double>(end_time - start_time)).count();
+                           std::chrono::duration_cast<std::chrono::seconds>(
+                                   std::chrono::duration<double>(end_time - start_time)).count();
 
-	fmt::print(stderr, "Found {} results, {} bytes/cycle, {} Gb/s\n",
-            result.size(), bytes_per_cycle, gb_per_second);
-	for (auto pos : result) {
-	    fmt::print("found at around {}\n", pos);
-	}
+    fmt::print(stderr, "Found {} results, {} bytes/cycle, {} Gb/s\n",
+               result.size(), bytes_per_cycle, gb_per_second);
+    for (auto pos : result) {
+        fmt::print("found at around {}\n", pos);
+    }
 }
