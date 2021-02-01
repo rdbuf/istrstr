@@ -1,0 +1,5 @@
+Problem: search fast in multiple GB's of text.
+Concept: perform a 2-pass search consisting of
+    1) a SIMD-powered filter for 4-byte prefixes
+    2) and a slower full string search.
+Current SOTA for 1: 4.465356282457702 bytes/cycle, 13.333333333333334 Gb/s on MBP 15 2019.
