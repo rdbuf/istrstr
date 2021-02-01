@@ -4,17 +4,14 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
-#include <x86intrin.h>
 #include <cstdlib>
 #include <chrono>
 
 // Algorithm:
 // 1. Take chunk of 4*m
-// 2. Make it lowercase
+// 2. Make it lowercase (TBD)
 // 3. Compare 4-byte sequences
-std::vector<uint64_t> find_all(const char* text, const char target[4]) {
-	const uint64_t text_n = strlen(text);
-
+std::vector<uint64_t> find_all(const char* text, const uint64_t text_n, const char target[4]) {
 	std::vector<uint64_t> result;
 
 	// Prepare target match vector
@@ -37,20 +34,21 @@ std::vector<uint64_t> find_all(const char* text, const char target[4]) {
 	    // Prepare 4 source match vectors w/ different offsets
         __m256i src0 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 0]));
         __m256i res0 = _mm256_cmpeq_epi32(src0, tgt);
+        bool found0 = !_mm256_testz_si256(res0, res0);
 
         __m256i src1 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 1]));
         __m256i res1 = _mm256_cmpeq_epi32(src1, tgt);
+        bool found1 = !_mm256_testz_si256(res1, res1);
 
         __m256i src2 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 2]));
         __m256i res2 = _mm256_cmpeq_epi32(src2, tgt);
+        bool found2 = !_mm256_testz_si256(res2, res2);
 
         __m256i src3 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 3]));
         __m256i res3 = _mm256_cmpeq_epi32(src3, tgt);
+        bool found3 = !_mm256_testz_si256(res3, res3);
 
-        if (!_mm256_testz_si256(res0, res0) ||
-            !_mm256_testz_si256(res1, res1) ||
-            !_mm256_testz_si256(res2, res2) ||
-            !_mm256_testz_si256(res3, res3)) {
+        if (found0 || found1 || found2 || found3) {
             result.push_back(i);
         }
 	}
@@ -111,7 +109,7 @@ int main(int argc, const char** argv) {
     uint64_t start = __rdtsc();
     std::vector<uint64_t> result;
     for (int iter = 0; iter < n_iters; ++iter) {
-        result = find_all(buffer.data(), target);
+        result = find_all(buffer.data(), buffer.size(), target);
     }
     uint64_t end = __rdtsc();
     auto end_time = std::chrono::high_resolution_clock::now();
