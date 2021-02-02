@@ -7,6 +7,20 @@
 #include <vector>
 #include <cstdlib>
 
+
+__m256i tolower(__m256i str) {
+    static const __m256i A_vec = _mm256_set1_epi8('A'-1);
+    static const __m256i Z_vec = _mm256_set1_epi8('Z'+1);
+    static const __m256i diff = _mm256_set1_epi8('a' ^ 'A');
+    __m256i aboveA = _mm256_cmpgt_epi8(str, A_vec);
+    __m256i belowZ = _mm256_cmpgt_epi8(Z_vec, str);
+    __m256i mask = _mm256_and_si256(aboveA, belowZ);
+    __m256i delta = _mm256_and_si256(mask, diff);
+    __m256i result = _mm256_add_epi8(str, delta);
+    return result;
+}
+
+
 // Algorithm:
 // 1. Take chunk of 4*m
 // 2. Make it lowercase - tbd
@@ -33,15 +47,19 @@ std::vector<uint64_t> find_all(const char *text, uint64_t text_n, const char tar
     for (int i = 0; i < loop_n; i += 29) {
         // Prepare 4 source match vectors w/ different offsets
         __m256i src0 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 0]));
+        src0 = tolower(src0);
         __m256i res0 = _mm256_cmpeq_epi32(src0, tgt);
 
         __m256i src1 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 1]));
+        src1 = tolower(src1);
         __m256i res1 = _mm256_cmpeq_epi32(src1, tgt);
 
         __m256i src2 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 2]));
+        src2 = tolower(src2);
         __m256i res2 = _mm256_cmpeq_epi32(src2, tgt);
 
         __m256i src3 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 3]));
+        src3 = tolower(src3);
         __m256i res3 = _mm256_cmpeq_epi32(src3, tgt);
 
         if (!_mm256_testz_si256(res0, res0) ||
