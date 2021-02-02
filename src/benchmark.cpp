@@ -16,7 +16,8 @@ int main(int argc, const char **argv) {
     }
     const char *text_filename = argv[1];
     const char *target = argv[2];
-    assert((strlen(target) == 4));
+    const int target_n = strlen(target);
+    assert((target_n == 4));
 
     int n_iters = 5;
     if (argc == 4) {
@@ -37,7 +38,7 @@ int main(int argc, const char **argv) {
     uint64_t start = __rdtsc();
     std::vector<uint64_t> result;
     for (int iter = 0; iter < n_iters; ++iter) {
-        result = find_all(buffer.data(), buffer.size(), target);
+        result = find_all__noicase_noutf8(buffer.data(), buffer.size(), target, target_n);
     }
     uint64_t end = __rdtsc();
     auto end_time = std::chrono::high_resolution_clock::now();

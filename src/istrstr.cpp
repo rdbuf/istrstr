@@ -11,8 +11,9 @@
 // 1. Take chunk of 4*m
 // 2. Make it lowercase - tbd
 // 3. Compare 4-byte sequences
-std::vector<uint64_t> find_all(const char *text, uint64_t text_n, const char target[4]) {
+std::vector<uint64_t> find_all__noicase_noutf8(const char *text, uint64_t text_n, const char* target, uint64_t target_n) {
     std::vector<uint64_t> result;
+    result.reserve(std::min<uint64_t>(text_n, 100000)); // so as to minimize allocations
 
     // Prepare target match vector
     std::array<uint8_t, 32> tgt_struct{};

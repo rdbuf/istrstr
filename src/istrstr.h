@@ -4,6 +4,6 @@
 
 #pragma once
 
-#include <array>
+#include <vector>
 
-std::vector<uint64_t> find_all(const char *text, uint64_t text_n, const char target[4]);
+std::vector<uint64_t> find_all__noicase_noutf8(const char *text, uint64_t text_n, const char* target, uint64_t target_n);
