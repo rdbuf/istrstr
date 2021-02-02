@@ -47,7 +47,7 @@ int main(int argc, const char **argv) {
                            std::chrono::duration_cast<std::chrono::seconds>(
                                    std::chrono::duration<double>(end_time - start_time)).count();
 
-    fmt::print(stderr, "Found {} results, {} bytes/cycle, {} Gb/s\n",
+    fmt::print(stderr, "Found {} results, {} bytes/cycle, {} GB/s\n",
                result.size(), bytes_per_cycle, gb_per_second);
     for (auto pos : result) {
         fmt::print("found at around {}\n", pos);
