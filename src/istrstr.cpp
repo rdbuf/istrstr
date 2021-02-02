@@ -24,7 +24,7 @@ std::vector<uint64_t> find_all(const char *text, uint64_t text_n, const char tar
     memcpy(&tgt_struct[20], target, 4);
     memcpy(&tgt_struct[24], target, 4);
     memcpy(&tgt_struct[28], target, 4);
-    __m256i tgt = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&tgt_struct));
+    __m256i tgt = _mm256_lddqu_si256(reinterpret_cast<const __m256i_u *>(&tgt_struct));
 
     // after each `i` we must have at least 35 bytes available
     uint64_t loop_n = (text_n >= 35) * (((text_n - 35) / 29) * 29);
@@ -32,16 +32,16 @@ std::vector<uint64_t> find_all(const char *text, uint64_t text_n, const char tar
 
     for (int i = 0; i < loop_n; i += 29) {
         // Prepare 4 source match vectors w/ different offsets
-        __m256i src0 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 0]));
+        __m256i src0 = _mm256_lddqu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 0]));
         __m256i res0 = _mm256_cmpeq_epi32(src0, tgt);
 
-        __m256i src1 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 1]));
+        __m256i src1 = _mm256_lddqu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 1]));
         __m256i res1 = _mm256_cmpeq_epi32(src1, tgt);
 
-        __m256i src2 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 2]));
+        __m256i src2 = _mm256_lddqu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 2]));
         __m256i res2 = _mm256_cmpeq_epi32(src2, tgt);
 
-        __m256i src3 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 3]));
+        __m256i src3 = _mm256_lddqu_si256(reinterpret_cast<const __m256i_u *>(&text[i + 3]));
         __m256i res3 = _mm256_cmpeq_epi32(src3, tgt);
 
         if (!_mm256_testz_si256(res0, res0) ||
@@ -54,19 +54,19 @@ std::vector<uint64_t> find_all(const char *text, uint64_t text_n, const char tar
     {
         std::array<uint8_t, 32> src_struct_0{};
         memcpy(&src_struct_0[0], &text[loop_n + 0], std::min<uint64_t>(32, remainder_n));
-        __m256i src0 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&src_struct_0));
+        __m256i src0 = _mm256_lddqu_si256(reinterpret_cast<const __m256i_u *>(&src_struct_0));
         __m256i res0 = _mm256_cmpeq_epi32(src0, tgt);
         std::array<uint8_t, 32> src_struct_1{};
         memcpy(&src_struct_1[0], &text[loop_n + 1], std::min<uint64_t>(28, remainder_n - 1));
-        __m256i src1 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&src_struct_1));
+        __m256i src1 = _mm256_lddqu_si256(reinterpret_cast<const __m256i_u *>(&src_struct_1));
         __m256i res1 = _mm256_cmpeq_epi32(src1, tgt);
         std::array<uint8_t, 32> src_struct_2{};
         memcpy(&src_struct_2[0], &text[loop_n + 2], std::min<uint64_t>(28, remainder_n - 2));
-        __m256i src2 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&src_struct_2));
+        __m256i src2 = _mm256_lddqu_si256(reinterpret_cast<const __m256i_u *>(&src_struct_2));
         __m256i res2 = _mm256_cmpeq_epi32(src2, tgt);
         std::array<uint8_t, 32> src_struct_3{};
         memcpy(&src_struct_3[0], &text[loop_n + 3], std::min<uint64_t>(28, remainder_n - 3));
-        __m256i src3 = _mm256_loadu_si256(reinterpret_cast<const __m256i_u *>(&src_struct_3));
+        __m256i src3 = _mm256_lddqu_si256(reinterpret_cast<const __m256i_u *>(&src_struct_3));
         __m256i res3 = _mm256_cmpeq_epi32(src3, tgt);
 
         if (!_mm256_testz_si256(res0, res0) ||
