@@ -3,7 +3,7 @@ project(istrstr)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(istrstr src/benchmark.cpp src/istrstr.h)
+add_executable(istrstr src/benchmark.cpp src/istrstr.h src/istrstr.cpp)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mavx2")
 

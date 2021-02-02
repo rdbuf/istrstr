@@ -2,12 +2,12 @@
 // Created by Ilya Pikulin on 02.02.2021.
 //
 
-#include "istrstr.h"
-
 #include <iostream>
 #include <fstream>
 #include <chrono>
 #include <fmt/core.h>
+
+#include "istrstr.h"
 
 int main(int argc, const char **argv) {
     if (argc < 3) {
@@ -37,7 +37,7 @@ int main(int argc, const char **argv) {
     uint64_t start = __rdtsc();
     std::vector<uint64_t> result;
     for (int iter = 0; iter < n_iters; ++iter) {
-        result = find_all(buffer.data(), target);
+        result = find_all(buffer.data(), buffer.size(), target);
     }
     uint64_t end = __rdtsc();
     auto end_time = std::chrono::high_resolution_clock::now();
